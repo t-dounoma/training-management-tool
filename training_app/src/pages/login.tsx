@@ -1,7 +1,7 @@
 // src/pages/login.tsx
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
-import { signIn } from 'next-auth/react';
+import { supabase } from '../../client/supabase';
 import crypto from 'crypto';
 
 const LoginPage: React.FC = () => {
@@ -10,25 +10,37 @@ const LoginPage: React.FC = () => {
     const [password, setPassword] = useState('');
 
     const handleLogin = async () => {
-        // Sign in using next-auth
-        const result = await signIn('credentials', {
-            redirect: false,
-            user_id: userId,
-            password: password,
-        });
+        // Fetch user data including salt and hashed password
+        const { data: userData, error: userError } = await supabase
+            .from('users')
+            .select('user_id, password, salt')
+            .eq('user_id', userId);
 
-        if (!result) {
-            console.error('Login failed: Result is undefined');
+        if (userError) {
+            console.error('Error fetching user data:', userError.message);
             return;
         }
 
-        if (result.error) {
-            console.error('Login failed:', result.error);
+        if (!userData || userData.length === 0) {
+            // User not found
+            console.error('User not found');
             return;
         }
 
-        // Redirect to user dashboard after successful login
-        router.push(`/dashboard/${userId}`);
+        // Validate the provided password using the stored salt
+        const storedPassword = userData[0].password;
+        const salt = userData[0].salt;
+
+        const hashedPassword = hashPassword(password, salt);
+
+        if (hashedPassword === storedPassword) {
+            // Password is correct, set the user ID in sessionStorage and redirect to user dashboard
+            sessionStorage.setItem('userId', userId);
+            router.push(`/dashboard/${userId}`);
+        } else {
+            // Incorrect password
+            console.error('Incorrect password');
+        }
     };
 
     // Function to hash the password with the salt

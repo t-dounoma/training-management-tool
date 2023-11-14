@@ -2,7 +2,8 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import { supabase } from '../../client/supabase';
-import {isStringObject} from "util/types"; // Supabase configuration file
+import {isStringObject} from "util/types";
+import crypto from "crypto"; // Supabase configuration file
 
 const SignupPage: React.FC = () => {
   const router = useRouter();
@@ -17,8 +18,8 @@ const SignupPage: React.FC = () => {
   const handleSignup = async () => {
     const { data: existingUserData, error: existingUserError } = await supabase
       .from('users')
-      .select('*');
-      // .eq('user_id', userId);
+      .select('user_id')
+      .eq('user_id', userId);
     console.log('existingUserData', existingUserData);
 
 
@@ -44,7 +45,7 @@ const SignupPage: React.FC = () => {
     // Store the user in the Supabase 'users' table
     const {error} = await supabase
       .from('users')
-      .insert([{ user_id: userId, password: hashedPassword}]);
+      .insert([{ user_id: userId, password: hashedPassword,salt:salt}]);
 
     // Registration successful, redirect to login page
     if (error) {
@@ -68,9 +69,12 @@ const SignupPage: React.FC = () => {
 
   // Function to hash the password with the salt
   const hashPassword = (password: string, salt: string) => {
-    // Use a secure hashing algorithm, such as bcrypt, for production
-    // For simplicity, this example uses a basic hash function
-    return password + salt; // This should be replaced with a secure hashing function
+    const saltedPassword = password + salt;
+    const hashedPassword = crypto
+        .createHash('sha256')
+        .update(saltedPassword)
+        .digest('hex');
+    return hashedPassword; // This should be replaced with a secure hashing function
   };
 
   return (

@@ -1,12 +1,10 @@
 // src/pages/signup.tsx
 import React, { useState } from 'react';
-import { useRouter } from 'next/router';
 import { supabase } from '../../client/supabase';
 import {isStringObject} from "util/types";
 import crypto from "crypto"; // Supabase configuration file
 
 const SignupPage: React.FC = () => {
-  const router = useRouter();
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -51,7 +49,7 @@ const SignupPage: React.FC = () => {
     if (error) {
 
     }else{
-      router.push('/login');
+      window.location.href = '/dashboard/login';
     }
   };
 

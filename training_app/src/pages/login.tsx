@@ -1,11 +1,9 @@
 // src/pages/login.tsx
 import React, { useState } from 'react';
-import { useRouter } from 'next/router';
 import { supabase } from '../../client/supabase';
 import crypto from 'crypto';
 
 const LoginPage: React.FC = () => {
-    const router = useRouter();
     const [userId, setUserId] = useState('');
     const [password, setPassword] = useState('');
 
@@ -36,7 +34,7 @@ const LoginPage: React.FC = () => {
         if (hashedPassword === storedPassword) {
             // Password is correct, set the user ID in sessionStorage and redirect to user dashboard
             sessionStorage.setItem('userId', userId);
-            router.push(`/dashboard/${userId}`);
+            window.location.href = '/dashboard/top';
         } else {
             // Incorrect password
             console.error('Incorrect password');

@@ -2,6 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { supabase } from '../../../client/supabase';
 import styles from './play-setting.module.css';
+import {
+  ReactServerDOMTurbopackClientEdge
+} from "next/dist/server/future/route-modules/app-page/vendored/ssr/entrypoints";
+import ReturnButton from "@/components/return/return";
 
 const PlaySetting: React.FC = () => {
   const [exerciseTime, setExerciseTime] = useState<number>(0);
@@ -52,6 +56,7 @@ const PlaySetting: React.FC = () => {
 
   return (
     <div className={styles.container}>
+      <ReturnButton />
       <h1 className={styles.title}>筋トレ設定画面</h1>
       <label>
         筋トレタイム/秒:

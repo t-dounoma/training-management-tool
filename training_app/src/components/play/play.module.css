@@ -1,0 +1,37 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.title {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.status {
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+.timer {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.elapsed_time {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.button {
+  width: 200px;
+  padding: 10px;
+  margin: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  background-color: #3498db;
+  color: #fff;
+}

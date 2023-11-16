@@ -1,0 +1,40 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.title {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.workout_time {
+  font-size: 18px;
+  margin-bottom: 20px;
+}
+
+.button {
+  width: 200px;
+  padding: 10px;
+  margin: 10px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.start_workout {
+  background-color: #27ae60;
+  color: #fff;
+}
+
+.view_history {
+  background-color: #3498db;
+  color: #fff;
+}
+
+.logout {
+  background-color: #e74c3c;
+  color: #fff;
+}

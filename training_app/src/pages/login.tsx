@@ -1,7 +1,7 @@
-// src/pages/login.tsx
 import React, { useState } from 'react';
 import { supabase } from '../../client/supabase';
 import crypto from 'crypto';
+import styles from '../components/account/login.module.css'
 
 const LoginPage: React.FC = () => {
     const [userId, setUserId] = useState('');
@@ -25,23 +25,19 @@ const LoginPage: React.FC = () => {
             return;
         }
 
-        // Validate the provided password using the stored salt
         const storedPassword = userData[0].password;
         const salt = userData[0].salt;
 
         const hashedPassword = hashPassword(password, salt);
 
         if (hashedPassword === storedPassword) {
-            // Password is correct, set the user ID in sessionStorage and redirect to user dashboard
             sessionStorage.setItem('userId', userId);
             window.location.href = '/dashboard/top';
         } else {
-            // Incorrect password
             console.error('Incorrect password');
         }
     };
 
-    // Function to hash the password with the salt
     const hashPassword = (password: string, salt: string) => {
         const saltedPassword = password + salt;
         const hashedPassword = crypto
@@ -50,19 +46,22 @@ const LoginPage: React.FC = () => {
             .digest('hex');
         return hashedPassword;
     };
-
+    const handleSignup = () => {
+        window.location.href = '/signup';
+    }
     return (
-        <div>
-            <h1>Login</h1>
-            <label>
-                User ID:
-                <input type="text" value={userId} onChange={(e) => setUserId(e.target.value)} />
-            </label>
-            <label>
-                Password:
-                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-            </label>
-            <button onClick={handleLogin}>Login</button>
+        <div className={styles.container}>
+            <div className={styles.title}>ログイン</div>
+            <div className={styles.form}>
+                <label>
+                    <input className={styles.input} type="text" placeholder="ユーザーネームを入力してください" value={userId} onChange={(e) => setUserId(e.target.value)} />
+                </label>
+                <label>
+                    <input className={styles.input} type="password" placeholder="パスワードを入力してください" value={password} onChange={(e) => setPassword(e.target.value)} />
+                </label>
+                <button className={`${styles.button} ${styles.signup}`} onClick={handleLogin}>ログイン</button>
+            </div>
+            <div>Don't have an account? <span className={styles.signup} onClick={handleSignup}>新規作成</span></div>
         </div>
     );
 };

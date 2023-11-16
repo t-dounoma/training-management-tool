@@ -1,11 +1,9 @@
-// src/pages/signup.tsx
 import React, { useState } from 'react';
-import { useRouter } from 'next/router';
 import { supabase } from '../../client/supabase';
-import {isStringObject} from "util/types"; // Supabase configuration file
+import styles from '../components/account/signup.module.css';
+import crypto from "crypto";
 
 const SignupPage: React.FC = () => {
-  const router = useRouter();
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -15,10 +13,29 @@ const SignupPage: React.FC = () => {
   console.log(confirmPassword);
 
   const handleSignup = async () => {
+
+    if (password !== confirmPassword) {
+      // パスワードが一致しなかった場合
+      console.error('Passwords do not match');
+      alert("パスワードが一致しません")
+      return;
+    }
+    // パスワードは8文字以上、英数字をそれぞれ1文字以上とする
+    if (password.length < 8) {
+      console.error('Passwords is too short');
+      alert("パスワードは8文字以上で入力してください")
+      return;
+    }
+    if (!password.match(/^(?=.*?[a-z])(?=.*?\d)[a-z\d]{8,100}$/i)) {
+      console.error('Passwords is too short');
+      alert("パスワードは英数字をそれぞれ1文字以上含む必要があります")
+      return;
+    }
+
     const { data: existingUserData, error: existingUserError } = await supabase
       .from('users')
-      .select('*');
-      // .eq('user_id', userId);
+      .select('user_id')
+      .eq('user_id', userId);
     console.log('existingUserData', existingUserData);
 
 
@@ -33,30 +50,24 @@ const SignupPage: React.FC = () => {
       return;
     }
 
-    // Generate a random salt
     const salt = generateRandomSalt();
-
-    // Hash the password with the salt
     const hashedPassword = hashPassword(password, salt);
 
     console.log("push_userId",userId)
     console.log("push_password",hashedPassword)
-    // Store the user in the Supabase 'users' table
     const {error} = await supabase
       .from('users')
-      .insert([{ user_id: userId, password: hashedPassword}]);
+      .insert([{ user_id: userId, password: hashedPassword,salt:salt}]);
 
-    // Registration successful, redirect to login page
     if (error) {
 
     }else{
-      router.push('/login');
+      window.location.href = '/login';
     }
   };
 
-  // Function to generate a random salt
   const generateRandomSalt = () => {
-    const length = 16; // You can adjust the length of the salt
+    const length = 16;
     const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     let result = '';
     for (let i = 0; i < length; i++) {
@@ -66,29 +77,59 @@ const SignupPage: React.FC = () => {
     return result;
   };
 
-  // Function to hash the password with the salt
   const hashPassword = (password: string, salt: string) => {
-    // Use a secure hashing algorithm, such as bcrypt, for production
-    // For simplicity, this example uses a basic hash function
-    return password + salt; // This should be replaced with a secure hashing function
+    const saltedPassword = password + salt;
+    const hashedPassword = crypto
+        .createHash('sha256')
+        .update(saltedPassword)
+        .digest('hex');
+    return hashedPassword;
+  };
+  const handleLogin = () => {
+    window.location.href = '/login';
   };
 
   return (
-    <div>
-      <h1>Sign Up</h1>
-      <label>
-        User ID:
-        <input type="text" value={userId} onChange={(e) => setUserId(e.target.value)} />
-      </label>
-      <label>
-        Password:
-        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-      </label>
-      <label>
-        Confirm Password:
-        <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
-      </label>
-      <button onClick={handleSignup}>Sign Up</button>
+    <div className={styles.container}>
+      <div className={styles.title}>新規登録</div>
+      <div className={styles.form}>
+        <label>
+          <input
+            className={styles.input}
+            type="text"
+            placeholder="ユーザーネームを入力してください"
+            value={userId}
+            onChange={(e) => setUserId(e.target.value)}
+          />
+        </label>
+        <label>
+          <input
+            className={styles.input}
+            type="password"
+            placeholder="パスワードを入力してください"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </label>
+        <label>
+          <input
+            className={styles.input}
+            type="password"
+            placeholder="パスワードを再入力してください"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
+        </label>
+        <button className={`${styles.button} ${styles.login}`} onClick={handleSignup}>
+          新規登録
+        </button>
+      </div>
+      <div>
+        Already have an account?{' '}
+        <span className={styles.login} onClick={handleLogin}>
+          ログイン
+        </span>
+      </div>
     </div>
   );
 };

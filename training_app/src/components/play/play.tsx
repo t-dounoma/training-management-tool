@@ -19,7 +19,7 @@ const PlayComponent: React.FC<PlayProps> = ({ selectedWorkout, exerciseTime, res
         const timeout = setTimeout(() => {
             setElapsedTime((prevElapsedTime) => prevElapsedTime + 1);
             setTimer((prevTime) => {
-                if (prevTime > 0) {
+                if (prevTime > 1) {
                     return prevTime - 1;
                 } else {
                     setIsWorkingOut((prev) => !prev);
